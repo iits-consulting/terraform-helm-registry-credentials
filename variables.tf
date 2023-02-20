@@ -1,7 +1,7 @@
 variable "registry_credentials_version" {
-  description = "Version of Registry Credentials chart. (default: 1.1.2)"
+  description = "Version of Registry Credentials chart. (default: 1.1.3)"
   type        = string
-  default     = "1.1.2"
+  default     = "1.1.3"
 }
 
 variable "registry_credentials_namespace" {
@@ -13,7 +13,6 @@ variable "registry_credentials_namespace" {
 variable "registry_credentials_dockerconfig" {
   description = "Dockerconfig in kubernetes.io/dockerconfigjson format. See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/"
   type        = string
-  default     = ""
   sensitive   = true
 }
 

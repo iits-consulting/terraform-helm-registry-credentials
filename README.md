@@ -1,24 +1,29 @@
-## Auto Create ArgoCD
+## Registry Credentials
+
+Installs the registry credentials helm chart [https://github.com/iits-consulting/registry-creds-chart]().
+
+See [https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/]() for how to create docker config json.
 
 Usage Example
 
 ```hcl
-module "argocd" {
-  source  = "registry.terraform.io/iits-consulting/bootstrap/argocd"
-  version = "X.X.X"
-  
-  ### Common CRD collection Configuration, see https://github.com/iits-consulting/crds-chart
-  custom_resource_definitions_enabled = true
-  
-  ### Registry Credentials Configuration for auto inject docker pull secrets, see https://github.com/iits-consulting/registry-creds-chart
-  registry_credentials_enabled      = true
-  registry_credentials_dockerconfig = var.dockerconfig_json_base64_encoded
 
-  ### ArgoCD Configuration
-  argocd_project_name              = "infrastructure-charts"
-  argocd_git_access_token_username = "ARGOCD_GIT_ACCESS_TOKEN"
-  argocd_git_access_token          = var.argocd_git_access_token
-  argocd_project_source_repo_url   = "https://github.com/iits-consulting/showcase-otc-infrastructure-charts.git"
-  argocd_project_source_path       = "stages/dev/infrastructure-charts"  
+locals {
+  dockerhubconfigjsonbase64 = base64encode(jsonencode({
+    auths = {
+      "https://${var.registry_url}" = {
+        username = var.registry_credentials_dockerconfig_username
+        password = var.registry_credentials_dockerconfig_password
+        auth     = base64encode("${var.registry_credentials_dockerconfig_username}:${var.registry_credentials_dockerconfig_password}")
+      }
+    }
+  }))
+}
+
+
+module "registry-credentials" {
+  source  = "iits-consulting/registry-credentials/helm"
+  version = "0.0.1"
+  registry_credentials_dockerconfig = local.dockerhubconfigjsonbase64
 }
 ```
